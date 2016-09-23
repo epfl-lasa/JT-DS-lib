@@ -59,3 +59,4 @@ P_joints_New_  The desired position of the joints
 
 Example of executions are available here:
 
+	https://github.com/epfl-lasa/rtk_JT_DS
