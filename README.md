@@ -14,7 +14,7 @@ This research was conducted in the Learning Algorithms and Systems Laboratory (L
 
 # How to run
 
-1. Initialization:
+1- Initialization:
 
 +  jseds::jseds(double dt_,int Num_C_,int Num_J_,int Num_Com_, Vector P_Joint_min_, Vector P_Joint_max_)
       dt_ is the sample time.
@@ -40,7 +40,8 @@ path_prior_ and path_mu_ and path_sigma_ are the paths to the Gaussian elements.
 
 path_W_ is the path to the dimension reduction matrix.
 ```
-2. In update loop:
+2- In update loop:
+
 + jseds::Set_State(Vector P_END_,Vector P_Joints_,Matrix Jacobian_, Vector Target_)
 ```
 P_END_ The current position of the end-effector
@@ -49,9 +50,9 @@ Jacobian_ The current Jacobian matrix
 Target_ The desired end-effector positions
 ```
 
-3. jseds::Update()
+3- jseds::Update()
 
-4. jseds::Get_State(Vector &V_joints_,Vector &P_joints_New_)
+4- jseds::Get_State(Vector &V_joints_,Vector &P_joints_New_)
 ```
 V_joints_ The desired velocity of the joints
 P_joints_New_  The desired position of the joints
