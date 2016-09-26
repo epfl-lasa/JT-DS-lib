@@ -17,8 +17,9 @@ This research was conducted in the Learning Algorithms and Systems Laboratory (L
 1- Initialization:
 
 +  jseds::jseds(double dt_,int Num_C_,int Num_J_,int Num_Com_, Vector P_Joint_min_, Vector P_Joint_max_)
-      dt_ is the sample time.
+     
 ```
+      dt_ is the sample time.
       Num_ Com_ is the number of the Gaussian components 
       Num_J is the number of the joints 
       Num_C_ is the dimension of the end-effector position
@@ -27,27 +28,27 @@ This research was conducted in the Learning Algorithms and Systems Laboratory (L
 
 +  jseds::initialize_P(const char *path_)
 ```
-Is the path to the P matrix
+path_ is the path to the P matrix
 ```
 
 +  jseds::initialize_A(const char *path_)
 ```
-Is the path to the A matrices
+path_ is the path to the A matrices
 ```
 +  jseds::initialize_GMM_Latend(const char *path_prior_,const char *path_mu_,const char *path_sigma_,const char *path_W_)
 ```
-path_prior_ and path_mu_ and path_sigma_ are the paths to the Gaussian elements.
+path_prior_, path_mu_ and path_sigma_ are the paths to the Gaussian elements.
 
 path_W_ is the path to the dimension reduction matrix.
 ```
-2- In update loop:
+2- In the update loop:
 
 + jseds::Set_State(Vector P_END_,Vector P_Joints_,Matrix Jacobian_, Vector Target_)
 ```
-P_END_ The current position of the end-effector
-P_Joints_ The current position of the joints
-Jacobian_ The current Jacobian matrix
-Target_ The desired end-effector positions
+P_END_ is the current position of the end-effector
+P_Joints_ is the current position of the joints
+Jacobian_ is the current Jacobian matrix
+Target_ is the desired end-effector positions
 ```
 
 3- jseds::Update()
@@ -58,6 +59,6 @@ V_joints_ The desired velocity of the joints
 P_joints_New_  The desired position of the joints
 ```
 
-Example of executions are available here:
+An example of executions is available here:
 
 	https://github.com/epfl-lasa/rtk_JT_DS
