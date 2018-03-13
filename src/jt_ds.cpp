@@ -31,6 +31,7 @@ jt_ds::jt_ds(double dt_,int Num_C_,int Num_J_,int Num_Com_, Vector P_Joint_min_,
 	Theta.Resize(Num_Com);			Theta.Zero();
 
 	q.Resize(Num_J); 				q.Zero();
+	q_mean.Resize(Num_J); 			q_mean.Zero();
 	Dq.Resize(Num_J); 				Dq.Zero();
 	q_new.Resize(Num_J); 			q_new.Zero();
 	q_min.Resize(Num_J); 			q_min.Zero();
@@ -99,9 +100,27 @@ void jt_ds::initialize_A(const char  *path_){
 	}
 
 }
-void jt_ds::initialize_GMM_Latend(const char  *path_prior_,const char  *path_mu_,const char  *path_sigma_,const char  *path_W_){
+void jt_ds::initialize_GMM_Latend(const char  *path_prior_,const char  *path_mu_,const char  *path_sigma_,const char  *path_W_,const char  *path_Mean_){
 
 	Matrix fMatrix;
+	fMatrix.Load(path_Mean_);
+	if (fMatrix.ColumnSize()==Num_J)
+	{
+		for (int i=0; i<Num_J; i++)
+		{
+			q_mean(i)=fMatrix(0,i);
+		}
+
+	}
+	else
+	{
+		cout<<"The size  of q_mean in the latent space is not right. "<<"Num_J "<<Num_J<<"fMatrix.ColumnSize() "<<fMatrix.ColumnSize()<<"fMatrix.Rowsize() "<<fMatrix.RowSize()<<endl;
+		fMatrix.Print("q_mean");
+		while (ros::ok){};
+	}
+	q_mean.Print("q_mean");
+
+	fMatrix.Resize(0,0);fMatrix.Zero();
 	fMatrix.Load(path_W_);
 	if (fMatrix.ColumnSize()==Num_J)
 	{
@@ -112,7 +131,8 @@ void jt_ds::initialize_GMM_Latend(const char  *path_prior_,const char  *path_mu_
 	}
 	else
 	{
-		cout<<"The size  of W in the latent space is not right."<<endl;
+		cout<<"The size  of W in the latent space is not right. "<<"Num_J "<<Num_J<<"fMatrix.ColumnSize() "<<fMatrix.ColumnSize()<<"fMatrix.Rowsize() "<<fMatrix.RowSize()<<endl;
+		fMatrix.Print("W");
 		while (ros::ok){};
 	}
 	W_Matrix.Print("W_Matrix");
@@ -219,7 +239,7 @@ void jt_ds::Set_State(Vector P_END_,Vector P_Joints_,Matrix Jacobian_, Vector Ta
 		else
 		{
 			cout<<"We passed the joint limits. The "<<i<<" joint is outside of the defined limits. q_min(i) "<<q_min(i)
-				<<" q_max(i) "<<q_max(i)<<" P_Joints_(i) "<<P_Joints_(i)<<endl;
+						<<" q_max(i) "<<q_max(i)<<" P_Joints_(i) "<<P_Joints_(i)<<endl;
 			while (ros::ok){};
 		}
 	}
@@ -247,16 +267,17 @@ void jt_ds::Set_State(Vector P_END_,Vector P_Joints_,Matrix Jacobian_, Vector Ta
 void jt_ds::Update(){
 
 	S_q=Calculate_S(q);
-	A_q=Calculate_A(q);
+	A_q=Calculate_A(q-q_mean);
 
-	Dq=-S_q*A_q*S_q*Jacobian_T*P_Matrix*(P_End-Target);
-/*	Jacobian_T.Print("Jacobian_T");
+	//Dq=-S_q*A_q*S_q*Jacobian_T*P_Matrix*(P_End-Target);
+	Dq=-A_q*Jacobian_T*(P_End-Target);
+	/*	Jacobian_T.Print("Jacobian_T");
 	P_End.Print("P_End");
 	Target.Print("Target");
 	P_Matrix.Print("P_Matrix");
 	Dq=-A_q*Jacobian_T*P_Matrix*(P_End-Target);*/
-/*	Dq.Print("Dq");*/
-/*	Dq.Print("Dq");
+	/*	Dq.Print("Dq");*/
+	/*	Dq.Print("Dq");
 	S_q.Print("S_q");
 	A_q.Print("A_q");
 	Jacobian_T.Print("Jacobian_T");
@@ -285,7 +306,7 @@ Matrix jt_ds::Calculate_S(Vector q_){
 		handle=2*((q_(i)-q_min(i))/(q_max(i)-q_min(i)))-1;
 		S_(i,i)=1-pow(handle,2*Power_of_S);
 	}
-//	S_.Print("S_");
+	//	S_.Print("S_");
 	return S_;
 }
 
@@ -299,7 +320,7 @@ Matrix jt_ds::Calculate_A(Vector q_){
 	{
 		A_=A_+A_Matrix[i]*Theta(i);
 	}
-//	A_.Print("A_");
+	//	A_.Print("A_");
 	return A_;
 }
 
@@ -310,9 +331,9 @@ Vector jt_ds::Calculate_Theta(Vector q_)
 
 	Phi.Zero();
 	Phi=W_Matrix.Mult(q_);
-//	Phi.Print("Phi");
-//	W_Matrix.Print("W_Matrix");
-//	Phi.Print("Phi");
+	//	Phi.Print("Phi");
+	//	W_Matrix.Print("W_Matrix");
+	//	Phi.Print("Phi");
 	for (int i=0;i<Num_Com;i++)
 	{
 		Theta_(i)=Prior(i)*GaussianPDF(Phi,Mu[i],Sigma[i]);

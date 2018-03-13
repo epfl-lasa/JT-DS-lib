@@ -37,7 +37,7 @@ public:
 	jt_ds(double dt_,int Num_C_,int Num_J_,int Num_Com_, Vector P_Joint_min_, Vector P_Joint_max_);
 	void 			initialize_A(const char  *path_);
 	void 			initialize_P(const char  *path_);
-	void 			initialize_GMM_Latend(const char  *path_prior_,const char  *path_mu_,const char  *path_sigma_,const char  *path_W_);
+	void 			initialize_GMM_Latend(const char  *path_prior_,const char  *path_mu_,const char  *path_sigma_,const char  *path_W_,const char  *path_Mean_);
 	void 			Set_State(Vector P_END_,Vector P_Joints_,Matrix Jacobian_, Vector Target_);
 	void 			Update();
 	void 			Get_State(Vector &V_joints_,Vector &P_joints_New_);
@@ -59,6 +59,7 @@ private:
 
 	double 			dt;
 
+	Vector			q_mean;
 	Vector 			q;
 	Vector 			Dq;
 	Vector			q_new;
